@@ -23,25 +23,19 @@ class Groupshare(BaseModel):
             }
         }
 
-class Order(BaseModel):
-    serviceType : str
-    location : str
-    provider : str 
-    distance : int
-    customer : str
-    price : int
-    eta : int
-    results : str 
+class Register(BaseModel):
+    userName : str 
+    userType : str
+    fullName : str 
+    orgName : str
+    position : str 
+    tel : str
+    phone : str
+    email : str 
+    address : str 
+    CreateDate : str
 
-
-class Cat(BaseModel):
-    name : str 
-    breed : str
-    age : int
-    gender : str
-    location : str
-
-
+    
 class Login(BaseModel):
     username : str 
     password : str
@@ -71,41 +65,24 @@ class Profile(BaseModel):
 app = FastAPI()
 
 
-# @app.get("/")
-# def read_root():  
-#     print(" Somebody call /")
-#     return{"Hello" : "World"}  
+@app.post("/register")
+def register(register : Register) -> Register:
 
-# @app.get("/items/{item_id}")
-# def read_item(item_id:str):
-# #def read_item(item_id:int , q: Union[str,None] = None):
-#     print(" we going to select * from product Item ID =" + item_id)
-#     return {"item_id" : item_id}
-#             #, "q" : q}
+    register_dict = register.dict()
+    register_dict.update({"userId": "00001"})
+    print("Insert into profile values()") 
+   # login.results = "Successful"
+    return register_dict
 
-# @app.post("/order")
-# def create_groupshare(order : Order) -> Order:
-#     # order_dict = order.dict()
-#     # order_dict.update({"price": order.distance * 5})
-#     # order_dict.update({"eta": order.distance * 2})
-#     # order_dict.update({"results":"Successful"})
-    
-#     #SQL insert into order values() 
-#     order.price = order.distance * 5
-#     order.eta =  order.distance * 2
-#     order.results = "Successful"
+@app.post("/login")
+def login(login : Login) -> Login:
 
-#     return order
-
-
-# @app.get("/list_cat")
-# def list_cat() ->list[Cat]:
-#     #SQL select * from cat 
-#     return [
-#         Cat(name="numnim",breed="Persia",age=5,gender="F",location="TBS libary"),
-#         Cat(name="momo",breed="Persia",age=5,gender="F",location="TBS entrance"),
-
-#     ]
+    login_dict = login.dict()
+   
+    login_dict.update({"userId": "00001"})
+    login_dict.update({"results":"Successful"})
+    print("Seelct userID profile") 
+    return login_dict
 
 
 @app.post("/login")
