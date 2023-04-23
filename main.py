@@ -1,7 +1,11 @@
 from typing import Union
-
+from fastapi import APIRouter
 from fastapi import FastAPI 
 from pydantic import BaseModel
+
+app = FastAPI()
+router = APIRouter()
+
 
 class Groupshare(BaseModel):
     name : str 
@@ -35,9 +39,8 @@ class Register(BaseModel):
     address : str 
     CreateDate : str
 
-    
 class Login(BaseModel):
-    username : str 
+    userName : str 
     password : str
     userId : str 
 
@@ -61,10 +64,6 @@ class Profile(BaseModel):
     result :str
 
 
-
-app = FastAPI()
-
-
 @app.post("/register")
 def register(register : Register) -> Register:
 
@@ -74,45 +73,52 @@ def register(register : Register) -> Register:
    # login.results = "Successful"
     return register_dict
 
+@app.get("/eKYC_Dopa/{citizen_id}")
+def read_item(item_id:str):
+#def read_item(item_id:int , q: Union[str,None] = None):
+    print(" we going to  eKYC_Dopa  ID =" + item_id)
+    return {"citizenId" : item_id , 
+            "CardNumber" : " GE02 ",
+            "RequestNumber" : " วิภาวดี นุชถาวร ",
+            "NCBScore" : "754",
+            "results":"true"}
+
+@app.get("/eKYC_NCB/{citizen_id}")
+def read_item(item_id:str):
+#def read_item(item_id:int , q: Union[str,None] = None):
+    print(" we going to  eKYC_NCB  ID =" + item_id)
+      
+    return {"citizenId" : item_id , 
+            "userName" : " วิภาวดี นุชถาวร ",
+            "NCBType" : " GE02 ",
+            "NCBScore" : "754",
+            "NCBScoreType" : " AA " , 
+            "NCBCredit" : "99%" ,
+            "CheckDate" : "20230425 20:00",
+            "results":"Select / Insert Successful"}
+
+
 @app.post("/login")
 def login(login : Login) -> Login:
 
     login_dict = login.dict()
    
-    login_dict.update({"userId": "00001"})
-    login_dict.update({"results":"Successful"})
-    print("Seelct userID profile") 
-    return login_dict
-
-
-@app.post("/login")
-def login(login : Login) -> Login:
-
-    login_dict = login.dict()
-   
-    login_dict.update({"userId": "00001"})
+    login_dict.update({"user_id": "00001"})
     login_dict.update({"results":"Successful"})
    # login.results = "Successful"
 
     return login_dict
 
+@app.post("/logout")
+def login(login : Login) -> Login:
 
+    login_dict = login.dict()
+   
+    login_dict.update({"user_id": "00001"})
+    login_dict.update({"results":"Logout Successful"})
+   # login.results = "Successful"
 
-# @app.get("/profile/{userId}")
-# def read_item(item_id:str):
-# #def read_item(item_id:int , q: Union[str,None] = None):
-#     print(" we going to select * from product Item ID =" + item_id)
-#     return {"userId" : item_id , 
-#             "userName" : " วิภาวดี นุชถาวร ",
-#             "userType" : "ลูกแชร์",
-#             "fullName" : "หญิงนุ้ย เทสเตอร์เกาหลี " , 
-#             "orgName" : "ธนาคารอาคารสงเคราะห์" ,
-#             "position" : "นักพัฒนาระบบ",
-#             "Tel" : "026459000" ,
-#             "Mobile" :"0891234567", 
-#             "Email" : " mim@gmail.com",
-#             "results":"Successful"}
-
+    return login_dict
 
 
 @app.get("/get_profile/{user_id}")
@@ -141,7 +147,6 @@ def edit_item(profile:Profile) -> Profile:
    
     return profile
 
-
 @app.put("/lock_profile/{user_id}")
 def lock_item(item_id:str):
     print(" we going to change status profile Item ID =" + item_id)
@@ -149,38 +154,11 @@ def lock_item(item_id:str):
             "IsActive" : "N",
             "results":"Lock User Successful"}
 
-
 @app.delete("/delete_profile/{user_id}")
 def delete_item(item_id:str):
 #def read_item(item_id:int , q: Union[str,None] = None):
     print(" we going to delete profile Item ID =" + item_id)
     return {"results":"Delete Successful"}
-
-
-
-@app.get("/eKYC_Dopa/{citizen_id}")
-def read_item(item_id:str):
-#def read_item(item_id:int , q: Union[str,None] = None):
-    print(" we going to  eKYC_Dopa  ID =" + item_id)
-    return {"citizen_id" : item_id , 
-            "CardNumber" : " GE02 ",
-            "RequestNumber" : " วิภาวดี นุชถาวร ",
-            "NCBScore" : "754",
-            "results":"true"}
-
-@app.get("/eKYC_NCB/{citizen_id}")
-def read_item(item_id:str):
-#def read_item(item_id:int , q: Union[str,None] = None):
-    print(" we going to  eKYC_NCB  ID =" + item_id)
-      
-    return {"citizen_id" : item_id , 
-            "userName" : " วิภาวดี นุชถาวร ",
-            "NCBType" : " GE02 ",
-            "NCBScore" : "754",
-            "NCBScoreType" : " AA " , 
-            "NCBCredit" : "99%" ,
-            "CheckDate" : "20230425 20:00",
-            "results":"Select / Insert Successful"}
 
 
 class Province(BaseModel):
@@ -339,8 +317,6 @@ def list_Amphoes(province_id: int) ->list[Amphoes]:
 
     ]
 
-
-
 @app.get("/list_tambons/{amphoes_id}")
 def list_Tambons(amphoes_id: int) ->list[Tambons]:
     #SQL select * from cat 
@@ -359,3 +335,160 @@ def list_Tambons(amphoes_id: int) ->list[Tambons]:
         Tambons(amphoes_id=1,tambons_id=12,tambons_name="เสาชิงช้า",zipcode="10200"),
 
     ]
+
+
+class MemberLookShare(BaseModel):
+    lookShareName : str
+    lookShareSurName : str
+    imageLookShare : str
+
+class Bidding(BaseModel):
+    shareId : int   
+    userId : int 
+    # lookShareName : str
+    # lookShareSurName : str
+    # imageLookShare : str
+    # userType : str
+    period : int
+    interest : int
+    results : str
+
+class WinBidding(BaseModel):
+    shareId : int   
+    lookShareName : str
+    lookShareSurName : str
+    imageLookShare : str
+    userType : str
+    period : int
+    interest : int
+    isWin : str
+    
+class PaymentStatus(BaseModel):
+    shareId : int   
+    lookShareName : str
+    lookShareSurName : str
+    imageLookShare : str
+    userType : str
+    period : int
+    totalAmount : int
+    isWin : str
+    status : str
+    
+class ListShareLookShare(BaseModel):
+    shareId : int   
+    shareName : str
+    availableBalance : int
+    minInterest : int
+    dateStart : str    
+    totalPlayer : int
+    imageShare : str
+
+class QrPayment(BaseModel):
+    shareId : int
+    userId : int
+    period : int
+    account : str
+    totalAmount : int
+    qrImage : str
+    paymentKey : str
+    status : str
+
+class getToken(BaseModel):
+    userName : str
+    password : str
+    apiKey : str
+    token : str
+    status : str
+
+#app=FastAPI()
+
+@app.get("/list_share_look_share/{user_id}")
+def list_share_look_share(user_id : int) -> list[ListShareLookShare]:
+    
+    return[
+        ListShareLookShare(shareId=1,shareName="สมพร ดอกเบี้ยสูง",availableBalance=5000,minInterest=1000,dateStart="20230101",totalPlayer=6,imageShare="https://image.com"),
+      
+    ]
+
+@app.get("/list_member/{share_id}")
+def list_member(share_id : int) -> list[MemberLookShare]:
+    
+    return[
+        MemberLookShare(lookShareName="สมพร",lookShareSurName="สุขสดใส",imageLookShare="https://image.com"),
+        MemberLookShare(lookShareName="วรวิช",lookShareSurName="อังศุศาสตร์",imageLookShare="https://image.com"),
+        MemberLookShare(lookShareName="ภาณุชัย",lookShareSurName="สวัสดิ์เรียวกุล",imageLookShare="https://image.com"),
+        MemberLookShare(lookShareName="ณัฎฐา",lookShareSurName="ศิริธนไพศาล",imageLookShare="https://image.com"),
+        MemberLookShare(lookShareName="ปิยวรรณ",lookShareSurName="แซ่ลิ่ม",imageLookShare="https://image.com"),
+        MemberLookShare(lookShareName="วิภาวดี",lookShareSurName="นุชถาวร",imageLookShare="https://image.com"),
+    ]
+
+@app.post("/create_bidding")
+def create_bidding(request : Bidding) -> Bidding  :
+    #request_dict = request.dict()
+
+    # request.lookShareName = "วิภาวดี"
+    # request.lookShareSurName="นุชถาวร"
+    # request.imageLookShare="https://image.com"
+    # request.userType ="ลูกแชร์"
+    request.results = "Successful" 
+    return request
+
+@app.get("/list_win_bidding/{share_id}")
+def list_win_bidding(share_id : int) -> list[WinBidding]:
+    
+    return[
+       WinBidding(shareId=1,lookShareName="สมพร",lookShareSurName="สุขสดใส",imageLookShare="https://image.com",userType="ท้าวแชร์",period=1,interest=1000,isWin="Y"),
+       WinBidding(shareId=1,lookShareName="วรวิช",lookShareSurName="อังศุศาสตร์",imageLookShare="https://image.com",userType="ลูกแชร์",period=1,interest=1200,isWin="Y"),
+       WinBidding(shareId=1,lookShareName="ภาณุชัย",lookShareSurName="สวัสดิ์เรียวกุล",imageLookShare="https://image.com",userType="ลูกแชร์",period=1,interest=1300,isWin="Y"),
+       WinBidding(shareId=1,lookShareName="ณัฎฐา",lookShareSurName="ศิริธนไพศาล",imageLookShare="https://image.com",userType="ลูกแชร์",period=1,interest=1400,isWin="Y"),
+       #WinBidding(shareId=1,lookShareName="วิภาวดี",lookShareSurName="แซ่ลิ่ม",imageLookShare="https://image.com",userType="ลูกแชร์",period=1,interest=1600,isWin="Y"),
+       #WinBidding(shareId=1,lookShareName="ปิยวรรณ",lookShareSurName="แซ่ลิ่ม",imageLookShare="https://image.com",userType="ลูกแชร์",period=1,interest=1000,isWin="Y"),
+    ]
+
+@app.post("/payment_status")
+def payment_status(request : PaymentStatus) -> list[PaymentStatus] :
+ 
+    return[
+       PaymentStatus(shareId=1,lookShareName="สมพร",lookShareSurName="สุขสดใส",imageLookShare="https://image.com",userType="ท้าวแชร์",period=1,totalAmount=6000,isWin="N",status="Y"),
+       PaymentStatus(shareId=1,lookShareName="วรวิช",lookShareSurName="อังศุศาสตร์",imageLookShare="https://image.com",userType="ลูกแชร์",period=1,totalAmount=6200,isWin="N",status="Y"),
+       PaymentStatus(shareId=1,lookShareName="ภาณุชัย",lookShareSurName="สวัสดิ์เรียวกุล",imageLookShare="https://image.com",userType="ลูกแชร์",period=1,totalAmount=6300,isWin="N",status="Y"),
+       PaymentStatus(shareId=1,lookShareName="ณัฎฐา",lookShareSurName="ศิริธนไพศาล",imageLookShare="https://image.com",userType="ลูกแชร์",period=1,totalAmount=6400,isWin="N",status="N"),
+       PaymentStatus(shareId=1,lookShareName="วิภาวดี",lookShareSurName="แซ่ลิ่ม",imageLookShare="https://image.com",userType="ลูกแชร์",period=1,totalAmount=0,isWin="Y",status="N"),
+       PaymentStatus(shareId=1,lookShareName="ปิยวรรณ",lookShareSurName="แซ่ลิ่ม",imageLookShare="https://image.com",userType="ลูกแชร์",period=1,totalAmount=5000,isWin="N",status="N")
+    ]
+
+@app.post("/create_payment")
+def create_payment(QrPayment : QrPayment) -> QrPayment :
+    
+    QrPayment.shareId=1
+    QrPayment.userId=1
+    QrPayment.account="1234567890"
+    QrPayment.totalAmount=6200
+    QrPayment.qrImage = "https://image.com"
+    QrPayment.paymentKey="1111111111"
+    QrPayment.status="pending"
+
+    return QrPayment
+
+
+
+
+@app.post("/payment_success")
+def payment_success(QrPayment : QrPayment) -> QrPayment :
+    QrPayment.shareId=1
+    QrPayment.userId=1
+    QrPayment.account="1234567890"
+    QrPayment.totalAmount=6200
+    QrPayment.qrImage = "https://image.com"
+    QrPayment.paymentKey="1111111111"
+    QrPayment.status="success"
+
+    return QrPayment
+
+
+@app.post("/get_tokrn")
+def get_tokrn(getToken : getToken) -> getToken :
+    getToken.token = "abcdefghijk"
+    getToken.status =  "success"
+
+    return getToken
