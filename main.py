@@ -113,7 +113,7 @@ class Groupshare(BaseModel):
     description : str 
     price : float 
     datestart : str
-    userId : str 
+    user_id : str 
     imageURL : str
 
     class Config:
@@ -123,7 +123,7 @@ class Groupshare(BaseModel):
              "description": "test test ",
              "price": 1000,
              "datestart": "20230418",
-             "userId": "0001",
+             "user_id": "0001",
              "imageURL": "https://img.freepik.com/free-vector/money-bag_23-2147510861.jpg"
             }
         }
@@ -142,7 +142,6 @@ class Register(BaseModel):
     class Config:
         schema_extra = {
             "example" : {
-            "token" : "abcdefghijk",
             "userName" : " วิภาวดี นุชถาวร ",
             "fullName" : "หญิงนุ้ย เทสเตอร์เกาหลี " , 
             "userType" : "ลูกแชร์",
@@ -179,6 +178,14 @@ class Profile(BaseModel):
     result : str 
     message : str 
 
+@app.get("/eKYC_Dopa/{citizen_id}",tags=["Register"],)
+def read_item(citizen_id:str):
+#def read_item(item_id:int , q: Union[str,None] = None):
+    print(" we going to  eKYC_Dopa  ID =" + citizen_id)
+    return {"citizenId" : citizen_id , 
+            "firstName" : "วิภาวดี",
+            "lastName" : "นุชถาวร ",
+            "result":"true"}
 @app.post("/register",tags=["Register"],)
 async def register(register : Register,token: Annotated[str, Depends(oauth2_scheme)])-> Register:
     register_dict = register.dict()
@@ -191,23 +198,6 @@ async def register(register : Register,token: Annotated[str, Depends(oauth2_sche
             headers={"WWW-Authenticate": "Bearer"},
         )
     return register
-
-# @app.post("/register",tags=["Register"],)
-# def register(register : Register) -> Register:
-#     register_dict = register.dict()
-#     register_dict.update({"userId": "00001"})
-#     print("Insert into profile values()") 
-#    # login.results = "Successful"
-#     return register_dict
-
-@app.get("/eKYC_Dopa/{citizen_id}",tags=["Register"],)
-def read_item(citizen_id:str):
-#def read_item(item_id:int , q: Union[str,None] = None):
-    print(" we going to  eKYC_Dopa  ID =" + citizen_id)
-    return {"citizenId" : citizen_id , 
-            "firstName" : "วิภาวดี",
-            "lastName" : "นุชถาวร ",
-            "result":"true"}
 
 @app.get("/eKYC_NCB/{citizen_id}",tags=["Register"],)
 def read_item(citizen_id:str):
@@ -224,74 +214,35 @@ def read_item(citizen_id:str):
             "result":"true"}
 
 
-class Login(BaseModel):
-    token :str 
+
+class Signin(BaseModel):
     userName : str 
     password : str
     userId : str 
-    loginFlag : str
+    signinFlag : str
     result : str 
     message : str 
 
-@app.post("/login",tags=["Register"],)
-def login(login : Login) -> Login:
+@app.post("/signin",tags=["Register"],)
+def signin(singin : Signin) -> Signin:
 
-    login_dict = login.dict()
-    login_dict.update({"userId": "00001"})
-    login_dict.update({"loginFlag": "Y"})
-    login_dict.update({"result":"true"})
-    login_dict.update({"message":"Login Successful"})
-    return login_dict
+    singin_dict = singin.dict()
+    singin_dict.update({"userId": "00001"})
+    singin_dict.update({"signinFlag": "Y"})
+    singin_dict.update({"result":"true"})
+    singin_dict.update({"message":"Signin Successful"})
+    return singin_dict
 
-@app.post("/logout",tags=["Register"],)
-def logout(login : Login) -> Login:
+@app.post("/signout",tags=["Register"],)
+def signout(singin : Signin) -> Signin:
 
-    logout_dict = login.dict()
-    logout_dict.update({"userId": "00001"})
-    logout_dict.update({"loginFlag": "N"})
-    logout_dict.update({"result":"true"})
-    logout_dict.update({"message":"Logout Successful"})
-    return logout_dict
+    signout_dict = singin.dict()
+    signout_dict.update({"userId": "00001"})
+    signout_dict.update({"signinFlag": "N"})
+    signout_dict.update({"result":"true"})
+    signout_dict.update({"message":"Signout Successful"})
+    return signout_dict
 
-
-@app.get("/get_profile/{user_id}",tags=["Profile"],)
-def read_item(user_id:str):
-#def read_item(item_id:int , q: Union[str,None] = None):
-    print(" we going to select * from profile userId =" + user_id)
-    return {"userId" : user_id , 
-            "userName" : " วิภาวดี นุชถาวร ",
-            "fullName" : "หญิงนุ้ย เทสเตอร์เกาหลี " , 
-            "userType" : "ลูกแชร์",
-            "orgName" : "ธนาคารอาคารสงเคราะห์" ,
-            "position" : "นักพัฒนาระบบ",
-            "tel" : "026459000" ,
-            "phone" :"0891234567", 
-            "email" : " mim@gmail.com",
-            "address" : "63 ถนนพระราม 9 เขตห้วยขวาง กรุงเทพมหานคร 10310",
-            "imagepath" : " ../image/aaaa.jpg",
-            "isActive" : "Y",
-            "results":"Select Successful"}
-
-@app.post("/edit_profile/",tags=["Profile"],)
-def edit_item(profile:Profile) -> Profile:
-    #profile_dict = profile.dict()
-    profile.result = "Update Successful"
-    print(" we going to update profile Item ID =" + profile.userId + profile.userName)
-   
-    return profile
-
-@app.put("/lock_profile/{user_id}",tags=["Profile"],)
-def lock_item(user_id:str):
-    print(" we going to change status profile Item ID =" + user_id)
-    return {"userId" : user_id , 
-            "IsActive" : "N",
-            "results":"Lock User Successful"}
-
-@app.delete("/delete_profile/{user_id}",tags=["Profile"],)
-def delete_item(user_id:str):
-#def read_item(item_id:int , q: Union[str,None] = None):
-    print(" we going to delete profile Item ID =" + user_id)
-    return {"results":"Delete Successful"}
 
 
 class Province(BaseModel):
@@ -471,6 +422,49 @@ def list_Tambons(amphoes_id: int) ->list[Tambons]:
     ]
 
 
+
+
+
+@app.get("/get_profile/{user_id}",tags=["Profile"],)
+def read_item(user_id:str):
+#def read_item(item_id:int , q: Union[str,None] = None):
+    print(" we going to select * from profile userId =" + user_id)
+    return {"userId" : user_id , 
+            "userName" : " วิภาวดี นุชถาวร ",
+            "fullName" : "หญิงนุ้ย เทสเตอร์เกาหลี " , 
+            "userType" : "ลูกแชร์",
+            "orgName" : "ธนาคารอาคารสงเคราะห์" ,
+            "position" : "นักพัฒนาระบบ",
+            "tel" : "026459000" ,
+            "phone" :"0891234567", 
+            "email" : " mim@gmail.com",
+            "address" : "63 ถนนพระราม 9 เขตห้วยขวาง กรุงเทพมหานคร 10310",
+            "imagepath" : " ../image/aaaa.jpg",
+            "isActive" : "Y",
+            "results":"Select Successful"}
+
+@app.post("/edit_profile/",tags=["Profile"],)
+def edit_item(profile:Profile) -> Profile:
+    #profile_dict = profile.dict()
+    profile.result = "บันทึกสำเร็จ"
+    print(" we going to update profile Item ID =" + profile.userId + profile.userName)
+   
+    return profile
+
+@app.put("/lock_profile/{user_id}",tags=["Profile"],)
+def lock_item(user_id:str):
+    print(" we going to change status profile Item ID =" + user_id)
+    return {"userId" : user_id , 
+            "IsActive" : "N",
+            "results":"Lock User Successful"}
+
+@app.delete("/delete_profile/{user_id}",tags=["Profile"],)
+def delete_item(user_id:str):
+#def read_item(item_id:int , q: Union[str,None] = None):
+    print(" we going to delete profile Item ID =" + user_id)
+    return {"results":"Delete Successful"}
+
+
 class MemberLookShare(BaseModel):
     lookShareName : str
     lookShareSurName : str
@@ -618,7 +612,6 @@ def payment_success(QrPayment : QrPayment) -> QrPayment :
     return QrPayment
 
 
-
 class Group_share(BaseModel):
     group_share_name : str
     available_balance : int
@@ -627,6 +620,7 @@ class Group_share(BaseModel):
     total_player : int
     
 class Group_share_id(BaseModel):
+    group_share_id : str
     group_share_name : str
     monthly_interest : int
     min_interest : int
@@ -635,6 +629,22 @@ class Group_share_id(BaseModel):
     due_date : str
     starting_date :str
     result : str
+
+    class Config:
+        schema_extra = {
+            "example" : {
+            "group_share_id": "00010",
+            "group_share_name": "สมพร ดอกเบี้ยสูงมากเลย",
+            "monthly_interest": 100000,
+            "min_interest": 10000,
+            "total_player": 5,
+            "bidding_date": "1",
+            "due_date": "5",
+            "starting_date": "2023-04-04",
+            "result": "",
+            }
+        }
+
 
 class Login(BaseModel):
     username : str 
@@ -668,59 +678,61 @@ class LookShareBidding(BaseModel):
     isWin : str
 
 
-
-
-
-
-
-@app.post("/create_Group_share",tags=["ThaoShare"])
-def create_Group_share_id(Group_share_id:Group_share_id):
+@app.post("/create_group_share",tags=["ThaoShare"])
+def create_croup_share_id(Group_share_id:Group_share_id):
     print("insert into Group_share_id value()")
     print("create Group_share_id{0} for {1}" .format(Group_share_id.group_share_name,Group_share_id.monthly_interest,Group_share_id.min_interest,Group_share_id.total_player,
                                                      Group_share_id.bidding_date,Group_share_id.due_date,Group_share_id.starting_date))
-    
     Group_share_id_dict = Group_share_id.dict()
     Group_share_id_dict.update({"Groupshareid":"0000011"})
-    
     Group_share_id_dict.update({"results":"Successful"})
-    
     #return Group_share_id.dict
     return Group_share_id_dict
 
 @app.get("/list_group_share",tags=["ThaoShare"])
 def list_group_share() ->list[Group_share]:
     return [
-        Group_share(group_share_name="สมพร ดอกเบี้ยสูงมากเลย",available_balance=100000,min_interest=10000,date="2023-04-04",total_player=0/5),
-        Group_share(group_share_name="สมพร ดอกเบี้ยสูง",available_balance=5000,min_interest=1000,date="2023-01-01",total_player=4/5)
+        Group_share(group_share_name="สมพร ดอกเบี้ยสูงมาก",available_balance=100000,min_interest=10000,date="2023-04-04",total_player=0/5),
+        Group_share(group_share_name="สมพร ดอกเบี้ยสูง",available_balance=5000,min_interest=1000,date="2023-01-01",total_player=4/5),
+        Group_share(group_share_name="สมพร ดอกเบี้ยดี",available_balance=100000,min_interest=10000,date="2023-04-04",total_player=0/5),
+        Group_share(group_share_name="สมพร วงเงินน้อย",available_balance=5000,min_interest=1000,date="2023-01-01",total_player=4/5)
     ]
 
-
-
 @app.post("/edit_group_share",tags=["ThaoShare"])
-def edit_item(group_share: Group_share_id)-> Group_share_id:
+def edit_group_share_item(group_share: Group_share_id)-> Group_share_id:
     group_share_dict = group_share.dict()
+    # Group_share_id.group_share_id = "000010"
+    # Group_share_id.group_share_name = "สมพร ดอกเบี้ยสูงมากเลย"
+    # Group_share_id.monthly_interest = 100000
+    # Group_share_id.min_interest = 10000
+    # Group_share_id.total_player = 5
+    # Group_share_id.bidding_date = "1"
+    # Group_share_id.due_date = "5"
+    # Group_share_id.starting_date = "2023-04-04"
+    # Group_share_id.result = "แก้ไขสำเร็จ"
 
-    Group_share_id.group_share_name = "สมพร ดอกเบี้ยสูงมาก"
-    Group_share_id.monthly_interest = 100000
-    Group_share_id.min_interest = 10000
-    Group_share_id.total_player = 5
-    Group_share_id.bidding_date = "1"
-    Group_share_id.due_date = "5"
-    Group_share_id.starting_date = "2023-04-04"
-    Group_share_id.result = "Successful"
-
+    group_share_dict.update({"result":"แก้ไขสำเร็จ"})
     return group_share_dict
 
-@app.put("/lock_profile/{group_share}",tags=["ThaoShare"])
-def lock_item(item_id:str):
-    print(" we going to change status profile Item ID =" + item_id)
+@app.put("/lock_group_share/{group_share_id}",tags=["ThaoShare"])
+def lock_group_share_item(group_share_id:str):
+    print(" we going to change status profile Item ID =" + group_share_id)
    
-    return {"userId" : item_id , 
+    return {"group_share_id" : group_share_id , 
             "IsActive" : "N",
-            "results":"Lock User Successful"}
+            "result":"Lock Group Share Successful"}
 
+@app.put("/unlock_group_share/{group_share_id}",tags=["ThaoShare"])
+def unlock_group_share_item(group_share_id:str):
+    print(" we going to change status profile Item ID =" + group_share_id)
+   
+    return {"group_share_id" : group_share_id , 
+            "IsActive" : "Y",
+            "result":"Unlock Group Share Successful"}
 
-@app.delete("/delete_profile/{group_share}",tags=["ThaoShare"])
-def delete_item(item_id:str):
-    print(" we going to delete profile Item ID =" + item_id)
-    return {"results":"Delete Successful"}
+@app.delete("/delete_group_share/{group_share_id}",tags=["ThaoShare"])
+def delete_group_share_item(group_share_id:str):
+    print(" we going to delete profile Item ID =" + group_share_id)
+    return {"group_share_id" : group_share_id , 
+            "result":"Delete Group Share Successful"}
+   
